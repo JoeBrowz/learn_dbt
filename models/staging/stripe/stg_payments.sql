@@ -1,10 +1,11 @@
 with payment as (
 
     select
+        id as payment_id,
         orderid as order_id,
-        amount,
+        amount / 100 as amount,
         created as sale_date,
-        paymentmethod
+        paymentmethod as payment_method
 
     from raw.stripe.payment
     where status != 'fail'

@@ -6,22 +6,33 @@ with orders as (
 
 payment as (
 
-    select * from {{ ref('stf_payment') }}
+    select * from {{ ref('stg_payments') }}
 
 ),
 
-fct_orders as (
+order_payments as (
 
     select 
         order_id,
-        customer_id,
-        sum(amount)
+        sum(amount) as order_total
 
-    from orders
-    join payment using (order_id)
+    from payment
 
     group by order_id
 
+),
+
+final as (
+
+    select 
+        order_id,
+        orders.customer_id,
+        orders.order_date,
+        coalesce(order_payments.order_total, 0) as order_total
+    
+    from orders
+    left join order_payments using (order_id)
+
 )
 
-select * from fct_orders
+select * from final
